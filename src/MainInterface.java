@@ -25,6 +25,7 @@ public class MainInterface extends JFrame implements ActionListener{
     private TreeSet<String> alternatives;
     private TreeSet<String> users;
     private String problem = null;
+    private LogPanel logPanel;
     
     private int colWidth = (int) (Toolkit.getDefaultToolkit().getScreenSize().height * 0.25);
     private int buttonHeight = 40;
@@ -110,6 +111,11 @@ public class MainInterface extends JFrame implements ActionListener{
         alternativePanel.setAlignmentY(TOP_ALIGNMENT);
         alternativePanel.setPreferredSize(new Dimension(colWidth, alternativePanel.getPreferredSize().height));
         mainPanel.add(alternativePanel);
+        mainPanel.add(Box.createHorizontalStrut(30));
+        
+        logPanel = new LogPanel(colWidth,userPanel.getPreferredSize().height);
+        alternativePanel.setAlignmentY(TOP_ALIGNMENT);
+        mainPanel.add(logPanel);
         
         JScrollPane scrollPane = new JScrollPane(mainPanel);
 
@@ -180,11 +186,11 @@ public class MainInterface extends JFrame implements ActionListener{
         return entryName;
     }
     
-    private void logEvent(String msg) {
+    private void logEvent(String datetime, String msg) {
         if (msg.isEmpty()) return;
         try {
             FileWriter fw = new FileWriter(logFile, true);
-            fw.write(df.format(Calendar.getInstance().getTime()));
+            fw.write(datetime);
             fw.write(",");
             fw.write(msg);
             fw.write("\n");
@@ -197,12 +203,17 @@ public class MainInterface extends JFrame implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent ae) {
         if (ae.getSource() instanceof JButton) {
+            String datetime = df.format(Calendar.getInstance().getTime());
+            String text = ((JButton)ae.getSource()).getText();
             if (ae.getActionCommand().equals("user")) {
-                logEvent("user," + ((JButton)ae.getSource()).getText());
+                logEvent(datetime, "user," + text);
+                logPanel.addLog(datetime, "U", text);
             } else if (ae.getActionCommand().equals("crit")) {
-                logEvent("criteria," + ((JButton)ae.getSource()).getText());
+                logEvent(datetime, "criteria," + text);
+                logPanel.addLog(datetime, "C", text);
             } else if (ae.getActionCommand().equals("alt")) {
-                logEvent("alternative," + ((JButton)ae.getSource()).getText());
+                logEvent(datetime, "alternative," + text);
+                logPanel.addLog(datetime, "A", text);
             }
         }
     }
