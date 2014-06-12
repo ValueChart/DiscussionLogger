@@ -40,6 +40,8 @@ public class DiscussionLogger  extends JPanel implements ActionListener{
     JButton btnOpen;
     JButton btnCancel;   
     JPanel pnlButtons;
+    
+    MainInterface mainInt;
 
     public DiscussionLogger(){  
         //Set up the File List
@@ -47,7 +49,6 @@ public class DiscussionLogger  extends JPanel implements ActionListener{
         lstFiles = new JList<String>(listModel);
         lstFiles.setEnabled(false);
         lstFiles.setVisibleRowCount(10);       
-        lstFiles.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     
         scrList = new JScrollPane(lstFiles);
         lstFiles.setPreferredSize(new Dimension(200,500));
@@ -84,9 +85,22 @@ public class DiscussionLogger  extends JPanel implements ActionListener{
     public void actionPerformed(ActionEvent e) {        
         if ("btnOpen".equals(e.getActionCommand())) {
             frame.setVisible(false);
-            filename = lstFiles.getSelectedValue(); 
+            getList(); 
+            mainInt = new MainInterface(vc_files.get(0) + ".vc", vc_files);
         } else if ("btnCancel".equals(e.getActionCommand())) {
-                System.exit(0);
+            System.exit(0);
+        }
+    }
+    
+    // get all selected files
+    void getList(){
+        vc_files.clear();
+        int[] idx = lstFiles.getSelectedIndices();
+
+        // Get all the selected items using the indices
+        for (int i = 0; i < idx.length; i++) {
+          String file = listModel.getElementAt(idx[i]);
+          vc_files.add(file.split(".vc")[0]);
         }
     }
  
