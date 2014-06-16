@@ -1,6 +1,6 @@
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.EOFException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -14,7 +14,7 @@ import javax.swing.*;
 import acme.misc.ScanfReader;
 
 
-public class MainInterface extends JFrame implements ActionListener{
+public class MainInterface extends JFrame implements MouseListener{
     private static final long serialVersionUID = 1L;
     
     private String filename = "";
@@ -22,14 +22,14 @@ public class MainInterface extends JFrame implements ActionListener{
     SimpleDateFormat df;
 
     private TreeSet<String> criteria;
-    private TreeSet<String> alternatives;
+    private LinkedHashSet<String> alternatives;
     private TreeSet<String> users;
     private String problem = null;
     private LogPanel logPanel;
     
     private int colWidth = (int) (Toolkit.getDefaultToolkit().getScreenSize().height * 0.25);
     private int buttonHeight = 40;
-    private Font font = new Font("Arial", Font.PLAIN, 16);
+    private Font font = new Font("Arial", Font.PLAIN, 14);
     
     FileReader initReader;
     
@@ -42,7 +42,7 @@ public class MainInterface extends JFrame implements ActionListener{
         }
         
         criteria = new TreeSet<String>();
-        alternatives = new TreeSet<String>();
+        alternatives = new LinkedHashSet<String>();
         parseFile();
 
         df = new SimpleDateFormat("ddMMMyyyy-HHmmss");
@@ -61,13 +61,14 @@ public class MainInterface extends JFrame implements ActionListener{
         userPanel.add(new JLabel("Users"));
         for (String u : users) {
             userPanel.add(Box.createVerticalStrut(10));
-            JButton button = new JButton(u);
-            button.setActionCommand("user");
-            button.addActionListener(this);
+            JLabel button = new JLabel("<html>" + u + "</html>");
+            button.setName("user");
+            button.addMouseListener(this);
             button.setPreferredSize(new Dimension(colWidth, buttonHeight));
             button.setMaximumSize(new Dimension(colWidth, buttonHeight));
             button.setMinimumSize(new Dimension(colWidth, buttonHeight));
             button.setFont(font);
+            button.setBorder(BorderFactory.createLineBorder(Color.gray));
             userPanel.add(button);
         }
         userPanel.setAlignmentY(TOP_ALIGNMENT);
@@ -80,13 +81,14 @@ public class MainInterface extends JFrame implements ActionListener{
         criteriaPanel.add(new JLabel("Criteria"));
         for (String c : criteria) {
             criteriaPanel.add(Box.createVerticalStrut(10));
-            JButton button = new JButton(c);
-            button.setActionCommand("crit");
-            button.addActionListener(this);
+            JLabel button = new JLabel("<html>" + c + "</html>");
+            button.setName("crit");
+            button.addMouseListener(this);
             button.setPreferredSize(new Dimension(colWidth, buttonHeight));
             button.setMaximumSize(new Dimension(colWidth, buttonHeight));
             button.setMinimumSize(new Dimension(colWidth, buttonHeight));
             button.setFont(font);
+            button.setBorder(BorderFactory.createLineBorder(Color.gray));
             criteriaPanel.add(button);
         }
         criteriaPanel.setAlignmentY(TOP_ALIGNMENT);
@@ -97,16 +99,19 @@ public class MainInterface extends JFrame implements ActionListener{
         JPanel alternativePanel = new JPanel();
         alternativePanel.setLayout(new BoxLayout(alternativePanel, BoxLayout.Y_AXIS));
         alternativePanel.add(new JLabel("Alternatives"));
+        int i = 1;
         for (String a : alternatives) {
             alternativePanel.add(Box.createVerticalStrut(10));
-            JButton button = new JButton(a);
-            button.setActionCommand("alt");
-            button.addActionListener(this);
+            JLabel button = new JLabel("<html>(" + i + ") " + a + "</html>");
+            button.addMouseListener(this);
+            button.setName("alt");
             button.setPreferredSize(new Dimension(colWidth, buttonHeight));
             button.setMaximumSize(new Dimension(colWidth, buttonHeight));
             button.setMinimumSize(new Dimension(colWidth, buttonHeight));
             button.setFont(font);
+            button.setBorder(BorderFactory.createLineBorder(Color.gray));
             alternativePanel.add(button);
+            i++;
         }
         alternativePanel.setAlignmentY(TOP_ALIGNMENT);
         alternativePanel.setPreferredSize(new Dimension(colWidth, alternativePanel.getPreferredSize().height));
@@ -201,21 +206,46 @@ public class MainInterface extends JFrame implements ActionListener{
     }
 
     @Override
-    public void actionPerformed(ActionEvent ae) {
-        if (ae.getSource() instanceof JButton) {
+    public void mouseClicked(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void mouseExited(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void mousePressed(MouseEvent ae) {
+        if (ae.getSource() instanceof JLabel) {
+            JLabel button = (JLabel) ae.getSource();
             String datetime = df.format(Calendar.getInstance().getTime());
-            String text = ((JButton)ae.getSource()).getText();
-            if (ae.getActionCommand().equals("user")) {
+            String text = button.getText();
+            if (button.getName().equals("user")) {
                 logEvent(datetime, "user," + text);
                 logPanel.addLog(datetime, "U", text);
-            } else if (ae.getActionCommand().equals("crit")) {
+            } else if (button.getName().equals("crit")) {
                 logEvent(datetime, "criteria," + text);
                 logPanel.addLog(datetime, "C", text);
-            } else if (ae.getActionCommand().equals("alt")) {
+            } else if (button.getName().equals("alt")) {
                 logEvent(datetime, "alternative," + text);
                 logPanel.addLog(datetime, "A", text);
             }
         }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
     }
     
     
